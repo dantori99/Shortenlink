@@ -16,7 +16,19 @@ app.post("/shorten/generate", async (req, res) => {
 
         let { urlText } = req.body;
 
-        let data = await boxURL.create({ urlText, generatedLink: `shortenku.cc/${generateRandom(7)}` }, )
+        let data = await boxURL.create({ urlText, generatedLink: `shortenit.cc/${generateRandom(7)}` }, )
+
+        return res.status(201).json({ message: "Success", data })
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+app.post("/shorten/customURL", async (req, res) => {
+    try {
+        let { urlText, generatedLink } = req.body;
+
+        let data = await boxURL.create({ urlText, generatedLink })
 
         return res.status(201).json({ message: "Success", data })
     } catch (error) {
