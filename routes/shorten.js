@@ -2,6 +2,7 @@ const express = require("express");
 const boxURL = require("../models/shorten");
 const app = express();
 
+// generate random link
 app.post("/shorten/generate", async (req, res) => {
     try {
         function generateRandom(length) {
@@ -16,7 +17,7 @@ app.post("/shorten/generate", async (req, res) => {
 
         let { urlText } = req.body;
 
-        let data = await boxURL.create({ urlText, generatedLink: `shortenit.cc/${generateRandom(7)}` }, )
+        let data = await boxURL.create({ urlText, generatedLink: `${req.headers.host}/${generateRandom(7)}` }, )
 
         return res.status(201).json({ message: "Success", data })
     } catch (error) {
@@ -24,10 +25,21 @@ app.post("/shorten/generate", async (req, res) => {
     }
 })
 
+
+// generate custom URL
 app.post("/shorten/customURL", async (req, res) => {
     try {
         let { urlText, generatedLink } = req.body;
 
+        let totalData = await boxURL.find({})
+
+        let str = [];
+        
+        for (let i = 0; i < totalData.length; i++) {
+            str.push(totalData[i])
+            if (totalData[i].generatedLink === req.body.generatedLink) return res.status(500).json({ message: "this link has already been taken!" })
+        }
+        
         let data = await boxURL.create({ urlText, generatedLink })
 
         return res.status(201).json({ message: "Success", data })
@@ -36,6 +48,7 @@ app.post("/shorten/customURL", async (req, res) => {
     }
 })
 
+// getting the data
 app.get("/shorten/access", async (req, res) => {
     try {
         let { generatedLink } = req.body;
